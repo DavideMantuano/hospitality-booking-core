@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospitality Booking Core | Luxury Stays</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+        .navbar {
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.5px; }
+        .gold { color: #d4af37; }
+        .badge-top {
+            background-color: #334155;
+            color: #e2e8f0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #b45309 100%);
+            color: #ffffff;
+            text-align: center;
+            padding: 56px 20px;
+        }
+        .hero h1 { font-size: 2.2rem; margin-bottom: 10px; }
+        .hero p { font-size: 1.1rem; opacity: 0.85; }
+        .container { max-width: 1050px; margin: 32px auto; padding: 0 20px; }
+        .tabs { display: flex; justify-content: center; gap: 12px; margin-bottom: 28px; }
+        .tab-btn {
+            padding: 10px 22px;
+            border: 2px solid #0f172a;
+            background: #ffffff;
+            color: #0f172a;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active { background: #0f172a; color: #ffffff; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+            margin-bottom: 24px;
+        }
+        .row { display: flex; flex-wrap: wrap; gap: 16px; }
+        .col-8 { flex: 1 1 62%; }
+        .col-6 { flex: 1 1 48%; }
+        .col-4 { flex: 1 1 30%; min-width: 270px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-dark { background: #0f172a; color: #ffffff; }
+        .btn-dark:hover { background: #1e293b; }
+        .btn-success { background: #15803d; color: #ffffff; }
+        .btn-success:hover { background: #166534; }
+        .btn-outline { background: transparent; border: 1.5px solid #0f172a; color: #0f172a; }
+        .btn-outline:hover { background: #0f172a; color: #ffffff; }
+        .btn-danger { background: transparent; border: 1.5px solid #dc2626; color: #dc2626; width: auto; margin-top: 14px; }
+        .btn-danger:hover { background: #dc2626; color: #ffffff; }
+        .room-card {
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            display: flex;
+            flex-direction: column;
+        }
+        .room-banner {
+            height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        .room-body { padding: 18px; flex: 1; display: flex; flex-direction: column; }
+        .tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            align-self: flex-start;
+            margin-bottom: 8px;
+        }
+        .price { font-size: 1.25rem; font-weight: 700; margin: 12px 0; }
+        .alert {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .alert-danger { background: #fee2e2; color: #991b1b; border-left: 4px solid #dc2626; }
+        .alert-info { background: #e0f2fe; color: #075985; border-left: 4px solid #0284c7; }
+        .alert-warning { background: #fef3c7; color: #92400e; border-left: 4px solid #d97706; }
+        .receipt {
+            background: #ffffff;
+            border-left: 6px solid #15803d;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #ffffff;
+            background: #15803d;
+        }
+        .status-badge.cancelled { background: #dc2626; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="brand">HOSPITALITY <span class="gold">CORE</span></div>
+    <div class="badge-top">Spring Boot + MySQL REST Demo</div>
+</nav>
+
+<header class="hero">
+    <h1>Prenota il tuo Soggiorno Esclusivo</h1>
+    <p>Sistema centrale di disponibilita e prenotazioni alberghiere</p>
+</header>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab-btn active" id="btnTabCliente" onclick="cambiaTab('cliente')">Area Ospite (Prenota)</button>
+        <button class="tab-btn" id="btnTabAdmin" onclick="cambiaTab('admin')">Back-Office (Gestione Strutture)</button>
+    </div>
+
+    <!-- TAB 1: AREA OSPITE -->
+    <div id="tab-cliente" class="section active">
+        <div class="card">
+            <div class="row" style="align-items: flex-end;">
+                <div class="col-8">
+                    <label for="selectHotel">Seleziona la Struttura Alberghiera</label>
+                    <select id="selectHotel" style="margin-bottom: 0;"></select>
+                </div>
+                <div class="col-4">
+                    <button onclick="caricaCamere()" class="btn btn-dark">Cerca Camere Libere</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert hidden"></div>
+
+        <div id="gridCamere" class="row" style="margin-bottom: 24px;"></div>
+
+        <div id="formPrenotazioneCard" class="card hidden">
+            <h3 style="margin-bottom: 16px;">Completa la Prenotazione — <span id="titoloCameraScelta" style="color: #1d4ed8;"></span></h3>
+            <form onsubmit="inviaPrenotazione(event)">
+                <input type="hidden" id="cameraIdScelta">
+                <div class="row">
+                    <div class="col-6">
+                        <label>Nome e Cognome Ospite</label>
+                        <input type="text" id="nomeOspite" placeholder="Es. Giulia Bianchi" required>
+                    </div>
+                    <div class="col-6">
+                        <label>Email Ospite</label>
+                        <input type="email" id="emailOspite" placeholder="giulia@email.it" required>
+                    </div>
+                    <div class="col-6">
+                        <label>Data Check-In</label>
+                        <input type="date" id="checkIn" required>
+                    </div>
+                    <div class="col-6">
+                        <label>Data Check-Out</label>
+                        <input type="date" id="checkOut" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success" style="margin-top: 8px;">Conferma Prenotazione</button>
+            </form>
+        </div>
+
+        <div id="ricevutaCard" class="receipt hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h3 style="color: #15803d;">Prenotazione Confermata!</h3>
+                <span id="recStato" class="status-badge">CONFERMATA</span>
+            </div>
+            <p><strong>Codice Prenotazione:</strong> <span id="recCodice" style="font-size: 1.15rem; font-weight: 700;"></span></p>
+            <p><strong>Ospite:</strong> <span id="recOspite"></span></p>
+            <p><strong>Struttura & Camera:</strong> <span id="recStruttura"></span></p>
+            <p><strong>Soggiorno:</strong> Dal <span id="recIn"></span> al <span id="recOut"></span></p>
+            <h3 style="margin-top: 14px;">Totale Calcolato: <span id="recTotale" style="color: #15803d;"></span> EUR</h3>
+            <button id="btnCancella" onclick="cancellaPrenotazione()" class="btn btn-danger">Annulla Prenotazione e Libera Camera</button>
+        </div>
+    </div>
+
+    <!-- TAB 2: BACK-OFFICE ADMIN -->
+    <div id="tab-admin" class="section">
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <h3 style="margin-bottom: 14px;">Registra Nuovo Hotel</h3>
+                    <form onsubmit="creaHotel(event)">
+                        <input type="text" id="codiceStruttura" placeholder="Codice Struttura (es. MILMC)" required>
+                        <input type="text" id="nomeHotel" placeholder="Nome Hotel (es. Milan Marriott Hotel)" required>
+                        <input type="text" id="cittaHotel" placeholder="Citta (es. Milano)" required>
+                        <input type="number" id="stelleHotel" min="1" max="5" value="5" required>
+                        <button type="submit" class="btn btn-dark">Salva Hotel</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <h3 style="margin-bottom: 14px;">Aggiungi Camera a Hotel</h3>
+                    <form onsubmit="creaCamera(event)">
+                        <select id="adminSelectHotel"></select>
+                        <input type="text" id="numeroCamera" placeholder="Numero Camera (es. 202)" required>
+                        <input type="text" id="tipologiaCamera" placeholder="Tipologia (es. Junior Suite)" required>
+                        <input type="number" step="0.01" id="prezzoCamera" placeholder="Prezzo per notte (es. 320.00)" required>
+                        <button type="submit" class="btn btn-dark">Salva Camera</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const bannerGradients = [
+        'linear-gradient(135deg, #1e3a8a, #3b82f6)',
+        'linear-gradient(135deg, #0f766e, #14b8a6)',
+        'linear-gradient(135deg, #7c2d12, #d97706)'
+    ];
+    let ultimoCodicePrenotazione = '';
+
+    function cambiaTab(nome) {
+        document.getElementById('tab-cliente').classList.toggle('active', nome === 'cliente');
+        document.getElementById('tab-admin').classList.toggle('active', nome === 'admin');
+        document.getElementById('btnTabCliente').classList.toggle('active', nome === 'cliente');
+        document.getElementById('btnTabAdmin').classList.toggle('active', nome === 'admin');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        caricaHotel();
+        const domani = new Date(); domani.setDate(domani.getDate() + 1);
+        const dopo = new Date(); dopo.setDate(dopo.getDate() + 4);
+        document.getElementById('checkIn').value = domani.toISOString().split('T')[0];
+        document.getElementById('checkOut').value = dopo.toISOString().split('T')[0];
+    });
+
+    function mostraAlert(msg, tipo = 'danger') {
+        const box = document.getElementById('alertBox');
+        box.className = `alert alert-${tipo}`;
+        box.textContent = msg;
+        box.classList.remove('hidden');
+        setTimeout(() => box.classList.add('hidden'), 5000);
+    }
+
+    async function caricaHotel() {
+        const res = await fetch('/api/hotel');
+        const hotels = await res.json();
+        const selCliente = document.getElementById('selectHotel');
+        const selAdmin = document.getElementById('adminSelectHotel');
+        const options = hotels.map(h => `<option value="${h.id}">${h.nome} (${h.citta}) - ${h.stelle} Stelle</option>`).join('');
+        selCliente.innerHTML = options || '<option value="">Nessun hotel presente (crealo dal tab Back-Office)</option>';
+        selAdmin.innerHTML = options;
+        if (hotels.length > 0) caricaCamere();
+    }
+
+    async function caricaCamere() {
+        const hotelId = document.getElementById('selectHotel').value;
+        if (!hotelId) return;
+        const res = await fetch(`/api/camere/disponibili/${hotelId}`);
+        const camere = await res.json();
+        const grid = document.getElementById('gridCamere');
+
+        if (camere.length === 0) {
+            grid.innerHTML = `<div style="width:100%;"><div class="alert alert-warning">Nessuna camera libera per questo hotel al momento.</div></div>`;
+            return;
+        }
+
+        grid.innerHTML = camere.map((c, idx) => `
+            <div class="col-4">
+                <div class="room-card">
+                    <div class="room-banner" style="background: ${bannerGradients[idx % bannerGradients.length]};">
+                        SUITE & ROOM ${c.numeroCamera}
+                    </div>
+                    <div class="room-body">
+                        <span class="tag">${c.tipologia}</span>
+                        <h4>Camera ${c.numeroCamera}</h4>
+                        <div class="price">${Number(c.prezzoPerNotte).toFixed(2)} EUR <span style="font-size: 0.85rem; font-weight: 400; color: #64748b;">/ notte</span></div>
+                        <button onclick="selezionaCamera(${c.id}, '${c.numeroCamera} - ${c.tipologia}')" class="btn btn-outline">
+                            Seleziona Camera
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function selezionaCamera(id, label) {
+        document.getElementById('cameraIdScelta').value = id;
+        document.getElementById('titoloCameraScelta').textContent = label;
+        document.getElementById('formPrenotazioneCard').classList.remove('hidden');
+        document.getElementById('formPrenotazioneCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function inviaPrenotazione(e) {
+        e.preventDefault();
+        const payload = {
+            nomeOspite: document.getElementById('nomeOspite').value,
+            emailOspite: document.getElementById('emailOspite').value,
+            checkIn: document.getElementById('checkIn').value,
+            checkOut: document.getElementById('checkOut').value,
+            cameraId: Number(document.getElementById('cameraIdScelta').value)
+        };
+
+        const res = await fetch('/api/prenotazioni', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            mostraAlert(data.errore || Object.values(data.erroriValidazione).join(', '), 'danger');
+            return;
+        }
+
+        ultimoCodicePrenotazione = data.codicePrenotazione;
+        document.getElementById('recCodice').textContent = data.codicePrenotazione;
+        document.getElementById('recOspite').textContent = data.nomeOspite;
+        document.getElementById('recStruttura').textContent = `${data.nomeHotel} - Camera ${data.numeroCamera}`;
+        document.getElementById('recIn').textContent = data.checkIn;
+        document.getElementById('recOut').textContent = data.checkOut;
+        document.getElementById('recTotale').textContent = Number(data.costoTotale).toFixed(2);
+        const badge = document.getElementById('recStato');
+        badge.className = 'status-badge';
+        badge.textContent = data.stato;
+        document.getElementById('btnCancella').classList.remove('hidden');
+
+        document.getElementById('formPrenotazioneCard').classList.add('hidden');
+        document.getElementById('ricevutaCard').classList.remove('hidden');
+        caricaCamere();
+    }
+
+    async function cancellaPrenotazione() {
+        const res = await fetch(`/api/prenotazioni/${ultimoCodicePrenotazione}/cancella`, { method: 'PATCH' });
+        const data = await res.json();
+        if (res.ok) {
+            const badge = document.getElementById('recStato');
+            badge.className = 'status-badge cancelled';
+            badge.textContent = data.stato;
+            document.getElementById('btnCancella').classList.add('hidden');
+            mostraAlert('Prenotazione annullata: la camera e tornata disponibile!', 'info');
+            caricaCamere();
+        }
+    }
+
+    async function creaHotel(e) {
+        e.preventDefault();
+        const res = await fetch('/api/hotel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                codiceStruttura: document.getElementById('codiceStruttura').value,
+                nome: document.getElementById('nomeHotel').value,
+                citta: document.getElementById('cittaHotel').value,
+                stelle: Number(document.getElementById('stelleHotel').value)
+            })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            alert('Hotel registrato con successo!');
+            e.target.reset();
+            caricaHotel();
+        } else {
+            alert(data.errore || 'Errore nei dati');
+        }
+    }
+
+    async function creaCamera(e) {
+        e.preventDefault();
+        const res = await fetch('/api/camere', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                hotelId: Number(document.getElementById('adminSelectHotel').value),
+                numeroCamera: document.getElementById('numeroCamera').value,
+                tipologia: document.getElementById('tipologiaCamera').value,
+                prezzoPerNotte: Number(document.getElementById('prezzoCamera').value)
+            })
+        });
+        if (res.ok) {
+            alert('Camera aggiunta con successo!');
+            e.target.reset();
+            caricaCamere();
+        } else {
+            alert('Errore durante il salvataggio della camera');
+        }
+    }
+</script>
+</body>
+</html>
