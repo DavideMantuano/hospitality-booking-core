@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler extends RuntimeException {
+public class GlobalExceptionHandler {
 
     //Cattura gli errori di logica lanciati dai Service
     @ExceptionHandler(BusinessException.class)
